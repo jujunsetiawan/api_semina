@@ -1,62 +1,49 @@
-const Categories = require('./model');
+const { createCategories, deleteCategories, getAllCategories, getOneCategories, updateCategories } = require('../../../service/mongoose/categories')
+const { StatusCodes } = require('http-status-codes')
 
 const create = async (req, res, next) => {
-  try {
-    const { name } = req.body;
-    const result = await Categories.create({ name });
-    res.status(201).json({ status: 'success', data: result });
-  } catch (err) {
-    next(err);
-  }
+    try {
+      const result = await createCategories(req)
+      res.status(StatusCodes.CREATED).json({ status: 'success', data: result });
+    } catch (err) {
+      next(err);
+    }
 };
 
-const index = async(req, res, next) => {
+const index = async (req, res, next) => {
     try {
-        const result = await Categories.find()
-        res.status(200).json({ status: 'success', data: result })
-    } catch (error) {
-        next(error)
+      const result = await getAllCategories(req)
+      res.status(StatusCodes.OK).json({ status: 'success', data: result });
+    } catch (err) {
+      next(err);
     }
-}
+  };
 
-const find = async(req, res, next) => {
+const find = async (req, res, next) => {
     try {
-        const { id } = req.params
-
-        const result = await Categories.findOne({ _id: id })
-        if(!result) return res.status(404).json({ status: 'error', message: `tidak ada kategori dengan id ${id}` })
-
-        res.status(200).json({ status: 'success', data: result })
-    } catch (error) {
-        next(error)
+      const result = await getOneCategories(req)
+      res.status(StatusCodes.OK).json({ status: 'success', data: result });
+    } catch (err) {
+      next(err);
     }
-}
+  };
 
-const update = async(req, res, next) => {
+const update = async (req, res, next) => {
     try {
-        const { id } = req.params
-        const { name } = req.body
-
-        const result = await Categories.findOneAndUpdate({ _id: id }, { name }, { new: true, runValidators: true })
-        if(!result) return res.status(404).json({ status: 'error', message: `tidak ada kategori dengan id ${id}` })
-
-        res.status(200).json({ status: 'success', data: result })
-    } catch (error) {
-        next(error)
+      const result = await updateCategories(req)
+      res.status(StatusCodes.OK).json({ status: 'success', data: result });
+    } catch (err) {
+      next(err);
     }
-}
+  };
 
-const destroy = async(req, res, next) => {
+  const destroy = async (req, res, next) => {
     try {
-        const { id } = req.params
-
-        const result = await Categories.findByIdAndRemove(id)
-        if(!result) return res.status(404).json({ status: 'error', message: `tidak ada kategori dengan id ${id}` })
-
-        res.status(200).json({ status: 'success', message: 'kategori berhasil di hapus' })
-    } catch (error) {
-        next(error)
+      await deleteCategories(req)
+      res.status(200).json({ status: 'success', message: 'kategori berhasil dihapus' });
+    } catch (err) {
+      next(err);
     }
-}
+  };
 
 module.exports = { create, index, find, update, destroy }
