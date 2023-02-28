@@ -1,4 +1,5 @@
-const { model, Schema } = require('mongoose')
+const mongoose = require('mongoose')
+const { model, Schema } = mongoose
 
 const ticketCategorySchema = Schema(
     {
