@@ -1,21 +1,23 @@
 const mongoose = require('mongoose')
 const { model, Schema } = mongoose
 
-let talentSchema = Schema(
+const paymentSchema = Schema(
     {
-        name: {
+        type: {
             type: String,
-            required: [true, 'Field name can not empty']
+            required: [true, 'Tipe pembayaran harus diisi'],
+            minlength: 3,
+            maxlength: 50
         },
-        role: {
-            type: String,
-            default: '-'
-        },
-        // untuk membuat relasi pada mongoose kita perlu membuat types ObjectId
         image: {
             type: mongoose.Types.ObjectId,
             ref: 'Image',
             required: true
+        },
+        status: {
+            type: Boolean,
+            enum: [true, false],
+            default: true
         },
         organizer: {
             type: mongoose.Types.ObjectId,
@@ -26,4 +28,4 @@ let talentSchema = Schema(
     { timestamps: true }
 )
 
-module.exports = model('Talent', talentSchema)
+module.exports = model('Payment', paymentSchema)

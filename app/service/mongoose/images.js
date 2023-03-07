@@ -1,6 +1,11 @@
 const Images = require('../../api/v1/images/model');
 const { NotFoundError } = require('../../errors')
 
+const generatorUrlImage = async(req) => {
+  const result = `uploads/${req.file.filename}`
+  return result
+}
+
 const createImages = async (req) => {
   const result = await Images.create({
     name: req.file
@@ -18,4 +23,4 @@ const checkingImage = async (id) => {
     return result;
   };
 
-module.exports = { createImages, checkingImage };
+module.exports = { createImages, checkingImage, generatorUrlImage };

@@ -1,9 +1,9 @@
-const { createTalents, deleteTalents, getAllTalents, getOneTalents, updateTalents } = require('../../../service/mongoose/talents');
+const { createTalent, deleteTalent, getAllTalent, getOneTalent, updateTalent } = require('../../../service/mongoose/talents');
 const { StatusCodes } = require('http-status-codes');
   
 const create = async (req, res, next) => {
   try {
-    const result = await createTalents(req);
+    const result = await createTalent(req);
     res.status(StatusCodes.CREATED).json({ status: 'success', data: result });
   } catch (err) {
     next(err);
@@ -12,7 +12,7 @@ const create = async (req, res, next) => {
 
 const index = async (req, res, next) => {
   try {
-    const result = await getAllTalents(req);
+    const result = await getAllTalent(req);
     res.status(StatusCodes.OK).json({ status: 'success', data: result });
   } catch (err) {
     next(err);
@@ -21,7 +21,7 @@ const index = async (req, res, next) => {
 
 const find = async (req, res, next) => {
   try {
-    const result = await getOneTalents(req);
+    const result = await getOneTalent(req);
     res.status(StatusCodes.OK).json({ status: 'success', data: result });
   } catch (err) {
     next(err);
@@ -30,7 +30,7 @@ const find = async (req, res, next) => {
 
 const update = async (req, res, next) => {
   try {
-    const result = await updateTalents(req);
+    const result = await updateTalent(req);
     res.status(StatusCodes.OK).json({ status: 'success', data: result });
   } catch (err) {
     next(err);
@@ -39,7 +39,7 @@ const update = async (req, res, next) => {
 
 const destroy = async (req, res, next) => {
   try {
-    await deleteTalents(req);
+    await deleteTalent(req);
     res.status(StatusCodes.OK).json({ status: 'success', message: 'talets berhasil dihapus' });
   } catch (err) {
     next(err);
