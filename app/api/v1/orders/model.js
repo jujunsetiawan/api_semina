@@ -45,7 +45,7 @@ const orderSchema = Schema(
             },
             role: {
                 type: String,
-                default: 'Designer'
+                default: '-'
             }
         },
         status: {

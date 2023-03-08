@@ -102,6 +102,8 @@ const checkoutOrder = async(req) => {
     let totalPay = 0, totalOrderTicket = 0
     await tickets.forEach(tic => {
         checkingEvent.tickets.forEach(ticket => {
+            console.log(tic.ticketCategories.type)
+            console.log(ticket.type)
             if(tic.ticketCategories.type === ticket.type) {
                 if(tic.sumTicket > ticket.stock) {
                     throw new NotFoundError(`stock event tidak mencukupi`)
@@ -110,6 +112,8 @@ const checkoutOrder = async(req) => {
                     totalOrderTicket += tic.sumTicket
                     totalPay += tic.ticketCategories.price * tic.sumTicket
                 }
+            } else {
+                throw new BadRequestError('anda memilih kategori tiket yang salah')
             }
         })
     });
@@ -142,7 +146,7 @@ const checkoutOrder = async(req) => {
         payment
     })
 
-    await orderMail(req.participant.email, result)
+    await orderMail(personalDetail.email, result)
 
     await result.save()
     return result
