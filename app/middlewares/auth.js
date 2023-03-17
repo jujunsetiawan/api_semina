@@ -1,5 +1,6 @@
 const { UnauthorizedError, UnauthenticatedError } = require('../errors')
 const { isTokenValid } = require('../utils')
+const { admin } = require('../config')
 
 const authenticateUser = async(req, res, next) => {
     try {
@@ -56,25 +57,33 @@ const authenticateParticipant  = async(req, res, next) => {
     }
 }
 
-const googleAuthenticateParticipan = async(req, res, next) => {
+const googleAuthenticateParticipant = async(req, res, next) => {
     try {
         let token
 
         const authHeader = req.headers.authorization
-
+        
         if(authHeader && authHeader.startsWith('Bearer')) {
             token = authHeader.split(' ')[1]
         }
 
         if(!token) throw new UnauthenticatedError('authentication invalid')
 
-        const decodeValue = await admin.auth().verifyIdToken(token);
-        console.log(decodeValue);
+        const payload = await admin.auth().verifyIdToken(token);
+        console.log(payload)
 
-        return next()
-    } catch (e) {
-        return res.json({ message: 'Internal Error' });
+        req.participant = {
+            id: payload.participantId,
+            fullName: payload.firstName,
+            email: payload.email
+        }
+
+        return next();
+        
+    } catch (error) {
+        next(error)
     }
+
 }
 
 const authorizeRoles = (...roles) => {
@@ -84,4 +93,4 @@ const authorizeRoles = (...roles) => {
     }
 }
 
-module.exports = { authenticateUser, authenticateParticipant, authorizeRoles, googleAuthenticateParticipan }
+module.exports = { authenticateUser, authenticateParticipant, authorizeRoles, googleAuthenticateParticipant }

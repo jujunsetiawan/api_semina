@@ -23,6 +23,12 @@ const patricipantSchema = Schema(
             required: [true, 'password harus diisi'],
             minlength: 6
         },
+        googleSignID: {
+            type: String,
+            minlength: [28, "format google sign in salah"],
+            maxlength: [28, "format google sign in salah"],
+            default: null
+        },
         role: {
             type: String,
             default: '-'
@@ -47,6 +53,19 @@ patricipantSchema.pre('save', async function(next) {
     }
     next()
 })
+
+patricipantSchema.pre('save', async function(next) {
+    const User = this
+    if(User.isModified('googleSignID')) {
+        User.googleSignID = await bcrypt.hash(User.googleSignID, 12)
+    }
+    next()
+})
+
+patricipantSchema.methods.compareGoogleSignID = async function(canditatePassword) {
+    const isMatch = await bcrypt.compare(canditatePassword, this.googleSignID)
+    return isMatch
+}
 
 patricipantSchema.methods.comparePassword = async function(canditatePassword) {
     const isMatch = await bcrypt.compare(canditatePassword, this.password)

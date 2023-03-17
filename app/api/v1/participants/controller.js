@@ -1,5 +1,14 @@
 const { StatusCodes } = require('http-status-codes')
-const { signupParticipant, activateParticipant, signinParticipant, getAllEvent, getOneEvent, getAllOrders, checkoutOrder } = require('../../../service/mongoose/participants')
+const { signupParticipant, activateParticipant, signinParticipant, getAllEvent, getOneEvent, getAllOrders, checkoutOrder, googleAuthParticipant } = require('../../../service/mongoose/participants')
+
+const googleAuth = async(req, res, next) => {
+    try {
+        const result = await googleAuthParticipant(req)
+        res.status(StatusCodes.CREATED).json({ message: 'success', data: result })
+    } catch (error) {
+        next(error)
+    }
+}
 
 const signup = async(req, res, next) => {
     try {
@@ -64,4 +73,4 @@ const checkout = async(req, res, next) => {
     }
 }
 
-module.exports = { signup, activeParticipant, signin, getAllLandingPage, getOneLandingPage, getDashboard, checkout }
+module.exports = { signup, activeParticipant, signin, getAllLandingPage, getOneLandingPage, getDashboard, checkout, googleAuth }

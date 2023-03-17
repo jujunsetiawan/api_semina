@@ -6,6 +6,51 @@ const { otpMail, orderMail } = require('../mail')
 const { BadRequestError, NotFoundError, UnauthorizedError } = require('../../errors')
 const { createJWT, createTokenParticipant } = require('../../utils')
 
+const googleAuthParticipant = async(req) => {
+    const { firstName, lastName, email, password, role, googleSignID } = req.body
+
+    let result = await Participant.findOne({ email, status: 'tidak aktif' })
+    let checkUser = await Participant.findOne({ email, status: 'aktif' })
+
+    if(result) {
+        result.firstName = firstName
+        result.lastName = lastName
+        result.role = role
+        result.email = email
+        result.password = password
+        result.googleSignID = googleSignID
+        result.otp = Math.floor(Math.random() * 999999)
+        await result.save()
+        await otpMail(email, result)
+        delete result._doc.password
+        delete result._doc.otp
+        delete result._doc.googleSignID
+        return result
+    }
+
+    if(checkUser) {
+        if(!checkUser.googleSignID) {
+            checkUser.googleSignID = googleSignID
+            await checkUser.save()
+        }
+
+        const isPasswordCorrect = await checkUser.compareGoogleSignID(googleSignID)
+        if(!isPasswordCorrect) throw new UnauthorizedError('invalid credential')
+
+        const token = createJWT({payload: createTokenParticipant(checkUser)})
+        return { token }
+    }
+    
+    result = await Participant.create({firstName, lastName, email, role, password, googleSignID, otp: Math.floor(Math.random() * 999999)})
+    await otpMail(email, result)
+
+    delete result._doc.password
+    delete result._doc.otp
+    delete result._doc.googleSignID
+
+    return result
+}
+
 const signupParticipant = async(req, res, next) => {
     const { firstName, lastName, email, password, role } = req.body
 
@@ -44,7 +89,8 @@ const activateParticipant = async(req) => {
     delete result._doc.password
     delete result._doc.otp
     
-    return result
+    const token = createJWT({payload: createTokenParticipant(result)})
+    return { token }
 }
 
 const signinParticipant = async(req) => {
@@ -152,4 +198,4 @@ const checkoutOrder = async(req) => {
     return result
 }
 
-module.exports = { signupParticipant, activateParticipant, signinParticipant, getAllEvent, getOneEvent, getAllOrders, checkoutOrder }
+module.exports = { signupParticipant, activateParticipant, signinParticipant, getAllEvent, getOneEvent, getAllOrders, checkoutOrder, googleAuthParticipant }
